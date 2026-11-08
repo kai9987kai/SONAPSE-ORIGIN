@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SONAPSE-ORIGIN // Scientific Observatory</title>
+  <style>
+    :root {
+      --bg: #0a0d14;
+      --panel: #111726;
+      --border: #1e293b;
+      --text: #f1f5f9;
+      --text-dim: #94a3b8;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.2);
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    header {
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+    }
+    .status-badge {
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+      background: rgba(52, 211, 153, 0.15);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+    nav.tabs {
+      display: flex;
+      gap: 8px;
+      background: #0d121f;
+      padding: 6px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-dim);
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .tab-btn.active, .tab-btn:hover {
+      background: var(--panel);
+      color: var(--accent);
+      border-color: var(--border);
+    }
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      grid-gap: 16px;
+      padding: 16px;
+      overflow: hidden;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .panel-header {
+      padding: 10px 16px;
+      background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .panel-body {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      position: relative;
+    }
+    canvas#connectomeCanvas {
+      width: 100%;
+      height: 100%;
+      background: #07090e;
+      display: block;
+    }
+    .metric-row {
+      margin-bottom: 12px;
+    }
+    .metric-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+    }
+    .progress-bar {
+      height: 6px;
+      background: #1e293b;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.1s;
+    }
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    button.action-btn {
+      background: #1e293b;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button.action-btn:hover {
+      background: var(--accent);
+      color: #000;
+    }
+    table.compact-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+    }
+    table.compact-table th, table.compact-table td {
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    table.compact-table th {
+      color: var(--accent);
+    }
+    pre.equation {
+      background: #090d16;
+      padding: 8px;
+      border-radius: 4px;
+      border-left: 3px solid var(--accent);
+      font-size: 0.75rem;
+      color: var(--success);
+      margin-bottom: 8px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>SONAPSE-ORIGIN // Scientific Observatory</h1>
+    <div>
+      <span class="status-badge" id="connStatus">● Telemetry Live</span>
+      <span style="font-size: 0.75rem; color: var(--text-dim); margin-left: 12px;">Step: <b id="stepVal">0</b></span>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" onclick="switchView('overview')">A. Living Connectome</button>
+    <button class="tab-btn" onclick="switchView('theories')">E. Theory Lab</button>
+    <button class="tab-btn" onclick="switchView('discoveries')">F. Discovery Observatory</button>
+  </nav>
+
+  <main id="mainView">
+    <!-- Left: Connectome Canvas -->
+    <div class="panel">
+      <div class="panel-header">
+        <span>A. Living Connectome (2D Force-Layout & Neural Activity Spikes)</span>
+        <span style="font-size: 0.7rem; color: var(--text-dim);">Rich-Club Core & Synaptic Plasticity</span>
+      </div>
+      <div class="panel-body" style="padding: 0;">
+        <canvas id="connectomeCanvas"></canvas>
+      </div>
+    </div>
+
+    <!-- Right: Telemetry & Controls -->
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+      <!-- Homeostasis & Affect -->
+      <div class="panel" style="flex: 1;">
+        <div class="panel-header">
+          <span>B. Internal Homeostatic & Affective State</span>
+        </div>
+        <div class="panel-body">
+          <div class="metric-row">
+            <div class="metric-label"><span>Energy (Metabolic Reserve)</span><span id="valEnergy">1.00</span></div>
+            <div class="progress-bar"><div class="progress-fill" id="barEnergy" style="width: 100%;"></div></div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-label"><span>Integrity (Physical Viability)</span><span id="valIntegrity">1.00</span></div>
+            <div class="progress-bar"><div class="progress-fill" id="barIntegrity" style="width: 100%; background: var(--success);"></div></div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-label"><span>Fatigue (Computational Workload)</span><span id="valFatigue">0.00</span></div>
+            <div class="progress-bar"><div class="progress-fill" id="barFatigue" style="width: 0%; background: var(--warning);"></div></div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-label"><span>Prediction Error (Sensory Discrepancy)</span><span id="valPredErr">0.00</span></div>
+            <div class="progress-bar"><div class="progress-fill" id="barPredErr" style="width: 0%; background: var(--accent);"></div></div>
+          </div>
+          <hr style="border: 0; border-top: 1px solid var(--border); margin: 12px 0;">
+          <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 6px;">Multidimensional Affect Vector (Control States):</div>
+          <div id="affectTags" style="display: flex; flex-wrap: wrap; gap: 4px; font-size: 0.7rem;">
+            <span style="background: #1e293b; padding: 2px 6px; border-radius: 3px;">Valence: <b id="affVal">0.0</b></span>
+            <span style="background: #1e293b; padding: 2px 6px; border-radius: 3px;">Arousal: <b id="affAro">0.2</b></span>
+            <span style="background: #1e293b; padding: 2px 6px; border-radius: 3px;">Calmness: <b id="affCalm">0.8</b></span>
+            <span style="background: #1e293b; padding: 2px 6px; border-radius: 3px;">Fear: <b id="affFear">0.0</b></span>
+            <span style="background: #1e293b; padding: 2px 6px; border-radius: 3px;">Joy: <b id="affJoy">0.2</b></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Intervention Controls -->
+      <div class="panel" style="flex: 1;">
+        <div class="panel-header">
+          <span>D. Causal Intervention Console</span>
+        </div>
+        <div class="panel-body">
+          <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px;">Inject controlled perturbations to test causal counterfactuals:</p>
+          <div class="btn-group">
+            <button class="action-btn" onclick="sendIntervention({'inflict_damage': 0.25})">⚡ Shock Integrity (-25%)</button>
+            <button class="action-btn" onclick="sendIntervention({'replenish_energy': 0.3})">🔋 Replenish Energy</button>
+          </div>
+          <div class="btn-group">
+            <button class="action-btn" onclick="sendIntervention({'clamp_nodes': {0: 5.0, 1: -5.0}})">🔒 Clamp Hub Nodes</button>
+            <button class="action-btn" onclick="sendIntervention({'enable_plasticity': true})">🌱 Trigger Hebbian Sprout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("connectomeCanvas");
+    const ctx = canvas.getContext("2d");
+    let nodes = [];
+    let edges = [];
+
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    // Connect WebSocket
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    const ws = new WebSocket(`${protocol}//${window.location.host}/ws/telemetry`);
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      document.getElementById("stepVal").innerText = data.step;
+
+      // Update Homeostasis
+      document.getElementById("valEnergy").innerText = data.homeostasis.energy.toFixed(2);
+      document.getElementById("barEnergy").style.width = `${Math.min(100, data.homeostasis.energy * 100)}%`;
+      document.getElementById("valIntegrity").innerText = data.homeostasis.integrity.toFixed(2);
+      document.getElementById("barIntegrity").style.width = `${Math.min(100, data.homeostasis.integrity * 100)}%`;
+      document.getElementById("valFatigue").innerText = data.homeostasis.fatigue.toFixed(2);
+      document.getElementById("barFatigue").style.width = `${Math.min(100, data.homeostasis.fatigue * 100)}%`;
+      document.getElementById("valPredErr").innerText = data.homeostasis.prediction_error.toFixed(2);
+      document.getElementById("barPredErr").style.width = `${Math.min(100, data.homeostasis.prediction_error * 100)}%`;
+
+      // Update Affect
+      document.getElementById("affVal").innerText = data.affect.valence.toFixed(2);
+      document.getElementById("affAro").innerText = data.affect.arousal.toFixed(2);
+      document.getElementById("affCalm").innerText = data.affect.calmness.toFixed(2);
+      document.getElementById("affFear").innerText = data.affect.fear.toFixed(2);
+      document.getElementById("affJoy").innerText = data.affect.joy.toFixed(2);
+
+      // Initialize or update node positions
+      if (nodes.length !== data.graph.num_nodes) {
+        nodes = [];
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+        const radius = Math.min(cx, cy) * 0.7;
+        for (let i = 0; i < data.graph.num_nodes; i++) {
+          const angle = (i / data.graph.num_nodes) * 2 * Math.PI;
+          nodes.push({
+            x: cx + radius * Math.cos(angle) + (Math.random() - 0.5) * 40,
+            y: cy + radius * Math.sin(angle) + (Math.random() - 0.5) * 40,
+            type: data.node_types[i] || "node",
+            activity: 0
+          });
+        }
+      }
+
+      // Update activity levels
+      data.nodes_activity.forEach((act, idx) => {
+        if (nodes[idx]) nodes[idx].activity = act;
+      });
+      edges = data.graph.edges;
+
+      renderConnectome();
+    };
+
+    function renderConnectome() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Render edges
+      ctx.lineWidth = 1;
+      edges.forEach(e => {
+        const src = nodes[e.source];
+        const dst = nodes[e.target];
+        if (src && dst) {
+          ctx.strokeStyle = Math.abs(e.weight) > 0.5 ? "rgba(56, 189, 248, 0.25)" : "rgba(30, 41, 59, 0.4)";
+          ctx.beginPath();
+          ctx.moveTo(src.x, src.y);
+          ctx.lineTo(dst.x, dst.y);
+          ctx.stroke();
+        }
+      });
+
+      // Render nodes
+      nodes.forEach((n, idx) => {
+        const glow = Math.min(20, n.activity * 15);
+        ctx.fillStyle = n.type.includes("rich") ? "#f43f5e" : (n.type.includes("hub") ? "#fbbf24" : "#38bdf8");
+        ctx.shadowColor = ctx.fillStyle;
+        ctx.shadowBlur = glow;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, 5 + glow * 0.3, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+    }
+
+    function sendIntervention(interventionData) {
+      fetch("/api/intervention", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(interventionData)
+      });
+    }
+
+    function switchView(view) {
+      // Toggle tabs
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      event.target.classList.add("active");
+    }
+  </script>
+</body>
+</html>

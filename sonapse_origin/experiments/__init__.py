@@ -1,0 +1,27 @@
+"""Initial Experimental Programme: Experiments A through J."""
+
+from .runner import ExperimentRunner
+from .exp_a_architecture_integration import run_experiment_a
+from .exp_b_homeostasis_learning import run_experiment_b
+from .exp_c_global_workspace import run_experiment_c
+from .exp_d_oscillatory_communication import run_experiment_d
+from .exp_e_structural_plasticity import run_experiment_e
+from .exp_f_sleep_replay import run_experiment_f
+from .exp_g_metacognitive_self_modelling import run_experiment_g
+from .exp_h_open_ended_evolution import run_experiment_h
+from .exp_i_affective_regulation import run_experiment_i
+from .exp_j_candidate_law_discovery import run_experiment_j
+
+__all__ = [
+    "ExperimentRunner",
+    "run_experiment_a",
+    "run_experiment_b",
+    "run_experiment_c",
+    "run_experiment_d",
+    "run_experiment_e",
+    "run_experiment_f",
+    "run_experiment_g",
+    "run_experiment_h",
+    "run_experiment_i",
+    "run_experiment_j",
+]
