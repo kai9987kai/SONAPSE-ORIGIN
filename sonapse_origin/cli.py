@@ -22,6 +22,12 @@ from .experiments import (
     run_experiment_n,
     run_experiment_o,
     run_experiment_p,
+    run_experiment_q,
+    run_experiment_r,
+    run_experiment_s,
+    run_experiment_t,
+    run_experiment_u,
+    run_experiment_v,
 )
 from .infrastructure.database import ExperimentDatabase
 from .adapters.sonapse_adapter import SonapseLabAdapter
@@ -30,7 +36,7 @@ from .adapters.poseidon_adapter import PoseidonAdapter
 
 def cmd_run_experiments(args: argparse.Namespace) -> int:
     print("=" * 80)
-    print("SONAPSE-ORIGIN // EXTENDED EXPERIMENTAL PROGRAMME (A - P)")
+    print("SONAPSE-ORIGIN // EXTENDED EXPERIMENTAL PROGRAMME (A - V)")
     print("=" * 80)
 
     all_experiments = [
@@ -50,11 +56,21 @@ def cmd_run_experiments(args: argparse.Namespace) -> int:
         ("N", run_experiment_n),
         ("O", run_experiment_o),
         ("P", run_experiment_p),
+        ("Q", run_experiment_q),
+        ("R", run_experiment_r),
+        ("S", run_experiment_s),
+        ("T", run_experiment_t),
+        ("U", run_experiment_u),
+        ("V", run_experiment_v),
     ]
 
     selected = all_experiments
     if args.suite == "initial":
         selected = all_experiments[:10]
+    elif args.suite == "frontier_v1":
+        selected = all_experiments[10:16]
+    elif args.suite == "frontier_v2":
+        selected = all_experiments[16:]
     elif args.suite == "frontier":
         selected = all_experiments[10:]
 
@@ -112,9 +128,9 @@ def main(argv: list[str] | None = None) -> int:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # run-experiments
-    p_run = subparsers.add_parser("run-experiments", help="Run experimental suite (A-P)")
+    p_run = subparsers.add_parser("run-experiments", help="Run experimental suite (A-V)")
     p_run.add_argument("--sample-size", type=int, default=15, help="Sample size per condition")
-    p_run.add_argument("--suite", type=str, choices=["all", "initial", "frontier"], default="all", help="Subset to execute")
+    p_run.add_argument("--suite", type=str, choices=["all", "initial", "frontier", "frontier_v1", "frontier_v2"], default="all", help="Subset to execute")
     p_run.set_defaults(func=cmd_run_experiments)
 
     # serve

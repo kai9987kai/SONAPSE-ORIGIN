@@ -1,4 +1,4 @@
-"""Initial & Advanced Experimental Programme: Experiments A through P."""
+"""Initial & Advanced Frontier Experimental Programme: Experiments A through V."""
 
 from .runner import ExperimentRunner
 from .exp_a_architecture_integration import run_experiment_a
@@ -17,6 +17,12 @@ from .exp_m_causal_emergence import run_experiment_m
 from .exp_n_pci_lempel_ziv import run_experiment_n
 from .exp_o_hypergraph_synergy import run_experiment_o
 from .exp_p_metamorphic_rewiring import run_experiment_p
+from .exp_q_self_organized_criticality import run_experiment_q
+from .exp_r_precision_predictive_coding import run_experiment_r
+from .exp_s_partial_information_decomposition import run_experiment_s
+from .exp_t_iit_mechanism_phi import run_experiment_t
+from .exp_u_bioelectric_morphogenesis import run_experiment_u
+from .exp_v_multi_agent_communication import run_experiment_v
 
 __all__ = [
     "ExperimentRunner",
@@ -36,4 +42,10 @@ __all__ = [
     "run_experiment_n",
     "run_experiment_o",
     "run_experiment_p",
+    "run_experiment_q",
+    "run_experiment_r",
+    "run_experiment_s",
+    "run_experiment_t",
+    "run_experiment_u",
+    "run_experiment_v",
 ]
