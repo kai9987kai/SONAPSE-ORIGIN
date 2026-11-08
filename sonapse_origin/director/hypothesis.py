@@ -53,9 +53,19 @@ class ScientificHypothesis:
     ) -> HypothesisStatus:
         """Evaluates whether preregistered predictions were supported or falsified."""
         req_effect = self.predictions[0].minimum_effect_size if self.predictions else 0.2
-        if p_value < p_threshold and effect_size >= req_effect:
+        direction = self.predictions[0].expected_direction if self.predictions else "greater_than"
+        
+        # Check alignment with expected direction
+        if direction == "less_than":
+            aligned = (effect_size <= -req_effect)
+            reversed_effect = (effect_size > 0.0)
+        else:
+            aligned = (effect_size >= req_effect)
+            reversed_effect = (effect_size < 0.0)
+
+        if p_value < p_threshold and aligned:
             self.status = HypothesisStatus.SUPPORTED
-        elif effect_size < 0.0 or p_value >= p_threshold:
+        elif reversed_effect or p_value >= p_threshold:
             self.status = HypothesisStatus.FALSIFIED
         else:
             self.status = HypothesisStatus.INCONCLUSIVE
