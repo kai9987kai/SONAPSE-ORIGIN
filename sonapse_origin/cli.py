@@ -16,6 +16,12 @@ from .experiments import (
     run_experiment_h,
     run_experiment_i,
     run_experiment_j,
+    run_experiment_k,
+    run_experiment_l,
+    run_experiment_m,
+    run_experiment_n,
+    run_experiment_o,
+    run_experiment_p,
 )
 from .infrastructure.database import ExperimentDatabase
 from .adapters.sonapse_adapter import SonapseLabAdapter
@@ -24,10 +30,10 @@ from .adapters.poseidon_adapter import PoseidonAdapter
 
 def cmd_run_experiments(args: argparse.Namespace) -> int:
     print("=" * 80)
-    print("SONAPSE-ORIGIN // INITIAL EXPERIMENTAL PROGRAMME (EXPERIMENTS A - J)")
+    print("SONAPSE-ORIGIN // EXTENDED EXPERIMENTAL PROGRAMME (A - P)")
     print("=" * 80)
 
-    experiments = [
+    all_experiments = [
         ("A", run_experiment_a),
         ("B", run_experiment_b),
         ("C", run_experiment_c),
@@ -38,10 +44,22 @@ def cmd_run_experiments(args: argparse.Namespace) -> int:
         ("H", run_experiment_h),
         ("I", run_experiment_i),
         ("J", run_experiment_j),
+        ("K", run_experiment_k),
+        ("L", run_experiment_l),
+        ("M", run_experiment_m),
+        ("N", run_experiment_n),
+        ("O", run_experiment_o),
+        ("P", run_experiment_p),
     ]
 
+    selected = all_experiments
+    if args.suite == "initial":
+        selected = all_experiments[:10]
+    elif args.suite == "frontier":
+        selected = all_experiments[10:]
+
     results = []
-    for code, exp_fn in experiments:
+    for code, exp_fn in selected:
         print(f"\n[RUNNING] Experiment {code}...")
         res = exp_fn(sample_size=args.sample_size)
         results.append(res)
@@ -54,7 +72,7 @@ def cmd_run_experiments(args: argparse.Namespace) -> int:
     print("\n" + "=" * 80)
     print("EXPERIMENTAL PROGRAMME SUMMARY:")
     supported_count = sum(1 for r in results if r["status"] == "supported")
-    print(f"Total Experiments: {len(results)} | Supported: {supported_count} | Falsified: {len(results) - supported_count}")
+    print(f"Total Evaluated: {len(results)} | Supported: {supported_count} | Falsified: {len(results) - supported_count}")
     print("=" * 80)
     return 0
 
@@ -94,8 +112,9 @@ def main(argv: list[str] | None = None) -> int:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # run-experiments
-    p_run = subparsers.add_parser("run-experiments", help="Run initial experimental suite (A-J)")
-    p_run.add_argument("--sample-size", type=int, default=10, help="Sample size per condition")
+    p_run = subparsers.add_parser("run-experiments", help="Run experimental suite (A-P)")
+    p_run.add_argument("--sample-size", type=int, default=15, help="Sample size per condition")
+    p_run.add_argument("--suite", type=str, choices=["all", "initial", "frontier"], default="all", help="Subset to execute")
     p_run.set_defaults(func=cmd_run_experiments)
 
     # serve

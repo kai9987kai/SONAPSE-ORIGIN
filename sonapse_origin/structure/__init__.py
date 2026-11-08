@@ -1,4 +1,4 @@
-"""Structure Forge: Architecture generation, hypergraphs, genomes, and neural development."""
+"""Structure Forge: Architecture generation, hypergraphs, genomes, neural development, O-information synergy, and BCM metaplasticity."""
 
 from .genome import (
     ArchitectureGenome,
@@ -8,6 +8,8 @@ from .genome import (
 from .topology import TopologyGenerator
 from .hypergraph import HypergraphMessagePassing, MatchedGraphBaseline
 from .development import StructuralPlasticityEngine, STDPPlasticity
+from .synergy import HypergraphSynergyAssay
+from .metaplasticity import BCMMetaplasticityEngine
 
 __all__ = [
     "ArchitectureGenome",
@@ -18,4 +20,6 @@ __all__ = [
     "MatchedGraphBaseline",
     "StructuralPlasticityEngine",
     "STDPPlasticity",
+    "HypergraphSynergyAssay",
+    "BCMMetaplasticityEngine",
 ]

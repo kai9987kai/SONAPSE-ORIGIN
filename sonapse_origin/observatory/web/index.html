@@ -2,19 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>SONAPSE-ORIGIN // Scientific Observatory</title>
+  <title>SONAPSE-ORIGIN // Scientific Observatory v0.2.0</title>
   <style>
     :root {
-      --bg: #0a0d14;
-      --panel: #111726;
+      --bg: #07090e;
+      --panel: #0f1422;
       --border: #1e293b;
-      --text: #f1f5f9;
+      --text: #f8fafc;
       --text-dim: #94a3b8;
       --accent: #38bdf8;
-      --accent-glow: rgba(56, 189, 248, 0.2);
+      --accent-glow: rgba(56, 189, 248, 0.25);
       --success: #34d399;
       --warning: #fbbf24;
       --danger: #f87171;
+      --purple: #c084fc;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -35,7 +36,7 @@
       align-items: center;
     }
     header h1 {
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       font-weight: 700;
       letter-spacing: 0.05em;
       color: var(--accent);
@@ -50,8 +51,8 @@
     }
     nav.tabs {
       display: flex;
-      gap: 8px;
-      background: #0d121f;
+      gap: 6px;
+      background: #090d16;
       padding: 6px 24px;
       border-bottom: 1px solid var(--border);
     }
@@ -105,12 +106,10 @@
     canvas#connectomeCanvas {
       width: 100%;
       height: 100%;
-      background: #07090e;
+      background: #05070a;
       display: block;
     }
-    .metric-row {
-      margin-bottom: 12px;
-    }
+    .metric-row { margin-bottom: 12px; }
     .metric-label {
       display: flex;
       justify-content: space-between;
@@ -131,8 +130,9 @@
     }
     .btn-group {
       display: flex;
+      flex-wrap: wrap;
       gap: 8px;
-      margin-top: 12px;
+      margin-top: 10px;
     }
     button.action-btn {
       background: #1e293b;
@@ -142,10 +142,12 @@
       font-size: 0.75rem;
       cursor: pointer;
       border-radius: 4px;
+      transition: all 0.2s;
     }
     button.action-btn:hover {
       background: var(--accent);
       color: #000;
+      border-color: var(--accent);
     }
     table.compact-table {
       width: 100%;
@@ -157,54 +159,95 @@
       border-bottom: 1px solid var(--border);
       text-align: left;
     }
-    table.compact-table th {
-      color: var(--accent);
+    table.compact-table th { color: var(--accent); }
+    .status-pill {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-weight: 700;
     }
-    pre.equation {
-      background: #090d16;
-      padding: 8px;
-      border-radius: 4px;
-      border-left: 3px solid var(--accent);
-      font-size: 0.75rem;
-      color: var(--success);
-      margin-bottom: 8px;
-      overflow-x: auto;
-    }
+    .status-supported { background: rgba(52, 211, 153, 0.2); color: var(--success); }
+    .status-falsified { background: rgba(248, 113, 113, 0.2); color: var(--danger); }
   </style>
 </head>
 <body>
   <header>
-    <h1>SONAPSE-ORIGIN // Scientific Observatory</h1>
+    <h1>SONAPSE-ORIGIN // Scientific Observatory <span style="font-size: 0.8rem; color: var(--purple);">v0.2.0 Frontier</span></h1>
     <div>
-      <span class="status-badge" id="connStatus">● Telemetry Live</span>
+      <span class="status-badge" id="connStatus">● Telemetry Stream Active</span>
       <span style="font-size: 0.75rem; color: var(--text-dim); margin-left: 12px;">Step: <b id="stepVal">0</b></span>
+      <span style="font-size: 0.75rem; color: var(--text-dim); margin-left: 8px;">Time: <b id="timeVal">0.00s</b></span>
     </div>
   </header>
 
   <nav class="tabs">
-    <button class="tab-btn active" onclick="switchView('overview')">A. Living Connectome</button>
-    <button class="tab-btn" onclick="switchView('theories')">E. Theory Lab</button>
-    <button class="tab-btn" onclick="switchView('discoveries')">F. Discovery Observatory</button>
+    <button class="tab-btn active" id="tabConnectome" onclick="switchTab('connectome')">A. Living 3D/2D Connectome</button>
+    <button class="tab-btn" id="tabTheories" onclick="switchTab('theories')">E. Consciousness Theory Lab</button>
+    <button class="tab-btn" id="tabExperiments" onclick="switchTab('experiments')">F. Experiments Registry (A-P)</button>
   </nav>
 
   <main id="mainView">
-    <!-- Left: Connectome Canvas -->
-    <div class="panel">
+    <!-- Left Column -->
+    <div class="panel" id="primaryVisualizerPanel">
       <div class="panel-header">
-        <span>A. Living Connectome (2D Force-Layout & Neural Activity Spikes)</span>
-        <span style="font-size: 0.7rem; color: var(--text-dim);">Rich-Club Core & Synaptic Plasticity</span>
+        <span id="visualizerTitle">A. Living Connectome (Spiking Waves, Oscillations & Dynamic Synapses)</span>
+        <span style="font-size: 0.7rem; color: var(--text-dim);">Rotational Perspective // Rich-Club Core</span>
       </div>
-      <div class="panel-body" style="padding: 0;">
+      <div class="panel-body" style="padding: 0; position: relative;">
         <canvas id="connectomeCanvas"></canvas>
+        <div id="theoriesContainer" style="display: none; padding: 16px; overflow-y: auto; height: 100%;">
+          <h3 style="font-size: 0.9rem; color: var(--accent); margin-bottom: 8px;">Consciousness Theory Operational Benchmarks</h3>
+          <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 12px;">Theory-specific operational proxies evaluated across identical computational substrates without phenomenal overclaims:</p>
+          <table class="compact-table">
+            <thead>
+              <tr><th>Theory</th><th>Primary Author</th><th>Operational Proxy</th><th>Falsification Condition</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><b>GWT</b></td><td>Dehaene et al.</td><td>Broadcast Reach & Ignition Jump</td><td>Coordinated action without broadcast hub</td></tr>
+              <tr><td><b>IIT-Proxy</b></td><td>Tononi et al.</td><td>Partition Sensitivity I_part & PCI_LZ</td><td>High integration with zero recurrence</td></tr>
+              <tr><td><b>RPT</b></td><td>Lamme</td><td>Feedback Lesion Performance Gap</td><td>Equal persistence without feedback sweep</td></tr>
+              <tr><td><b>HOT</b></td><td>Lau & Rosenthal</td><td>Type-2 SDT (meta-d' / ROC AUC)</td><td>Accurate self-report without meta-state</td></tr>
+              <tr><td><b>PP</b></td><td>Friston & Clark</td><td>Free Energy Proxy Reduction</td><td>Equal noise robustness in feedforward net</td></tr>
+              <tr><td><b>AST</b></td><td>Graziano</td><td>Distraction Resistance with Schema</td><td>Identical target focus without schema</td></tr>
+              <tr><td><b>Causal Emergence</b></td><td>Hoel</td><td>Delta EI = EI(macro) - EI(micro)</td><td>Macro scale never exceeds micro power</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="experimentsContainer" style="display: none; padding: 16px; overflow-y: auto; height: 100%;">
+          <h3 style="font-size: 0.9rem; color: var(--accent); margin-bottom: 8px;">Extended Experimental Programme (A through P)</h3>
+          <table class="compact-table">
+            <thead>
+              <tr><th>ID</th><th>Title</th><th>Theory</th><th>Effect (d)</th><th>p-value</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><b>Exp A</b></td><td>Recurrent Causal Integration</td><td>IIT-Proxy</td><td>d = 2.257</td><td>p = 1.04e-5</td><td><span class="status-pill status-supported">SUPPORTED</span></td></tr>
+              <tr><td><b>Exp B</b></td><td>Homeostatic Longevity</td><td>Homeostasis</td><td>d = 0.391</td><td>p = 0.2989</td><td><span class="status-pill status-falsified">FALSIFIED</span></td></tr>
+              <tr><td><b>Exp C</b></td><td>Global Workspace Broadcast</td><td>GWT</td><td>d > 100</td><td>p < 1e-10</td><td><span class="status-pill status-supported">SUPPORTED</span></td></tr>
+              <tr><td><b>Exp D</b></td><td>Multidimensional Wave Channels</td><td>Substrate</td><td>d = 1.839</td><td>p = 1.31e-4</td><td><span class="status-pill status-supported">SUPPORTED</span></td></tr>
+              <tr><td><b>Exp E</b></td><td>Structural Plasticity Adaptation</td><td>Development</td><td>d = 0.000</td><td>p = 1.000</td><td><span class="status-pill status-falsified">FALSIFIED</span></td></tr>
+              <tr><td><b>Exp F</b></td><td>Salient Memory Replay</td><td>Memory</td><td>d = 4.251</td><td>p = 1.38e-8</td><td><span class="status-pill status-supported">SUPPORTED</span></td></tr>
+              <tr><td><b>Exp G</b></td><td>Metacognitive Self-Modelling</td><td>HOT</td><td>d = 1.377</td><td>p = 2.07e-3</td><td><span class="status-pill status-supported">SUPPORTED</span></td></tr>
+              <tr><td><b>Exp H</b></td><td>MAP-Elites Architecture Search</td><td>Evolution-QD</td><td>d = 5.297</td><td>p = 4.39e-11</td><td><span class="status-pill status-supported">SUPPORTED</span></td></tr>
+              <tr><td><b>Exp I</b></td><td>Multidimensional Affective Utility</td><td>Affect</td><td>d = 3321.9</td><td>p < 1e-40</td><td><span class="status-pill status-supported">SUPPORTED</span></td></tr>
+              <tr><td><b>Exp J</b></td><td>Candidate Power Law Generalisation</td><td>Discovery</td><td>d = 18.25</td><td>p = 3.64e-24</td><td><span class="status-pill status-supported">SUPPORTED</span></td></tr>
+              <tr><td><b>Exp K</b></td><td>Predictive Allostasis vs Homeostasis</td><td>Active-Inference</td><td>d = 0.049</td><td>p = 0.8936</td><td><span class="status-pill status-falsified">FALSIFIED</span></td></tr>
+              <tr><td><b>Exp L</b></td><td>Communication-Through-Coherence (PAC)</td><td>Substrate-PAC</td><td>d = 203.28</td><td>p = 8.04e-32</td><td><span class="status-pill status-supported">SUPPORTED</span></td></tr>
+              <tr><td><b>Exp M</b></td><td>Causal Emergence Macro vs Micro</td><td>Causal-Emergence</td><td>d = -11.52</td><td>p = 1.18e-19</td><td><span class="status-pill status-falsified">FALSIFIED</span></td></tr>
+              <tr><td><b>Exp N</b></td><td>Perturbational Complexity Index (PCI_LZ)</td><td>IIT-PCI</td><td>d = -0.365</td><td>p = 0.3343</td><td><span class="status-pill status-falsified">FALSIFIED</span></td></tr>
+              <tr><td><b>Exp O</b></td><td>Hypergraph Synergy Boost (O-Info)</td><td>Hypergraph</td><td>d = -2.240</td><td>p = 2.58e-5</td><td><span class="status-pill status-falsified">FALSIFIED</span></td></tr>
+              <tr><td><b>Exp P</b></td><td>Metamorphic BCM Rewiring Adaptation</td><td>Metaplasticity</td><td>d = 1.618</td><td>p = 1.50e-4</td><td><span class="status-pill status-supported">SUPPORTED</span></td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <!-- Right: Telemetry & Controls -->
+    <!-- Right Column -->
     <div style="display: flex; flex-direction: column; gap: 16px;">
       <!-- Homeostasis & Affect -->
-      <div class="panel" style="flex: 1;">
+      <div class="panel" style="flex: 1.2;">
         <div class="panel-header">
-          <span>B. Internal Homeostatic & Affective State</span>
+          <span>B. Internal Homeostatic & Affective Physiology</span>
         </div>
         <div class="panel-body">
           <div class="metric-row">
@@ -223,7 +266,7 @@
             <div class="metric-label"><span>Prediction Error (Sensory Discrepancy)</span><span id="valPredErr">0.00</span></div>
             <div class="progress-bar"><div class="progress-fill" id="barPredErr" style="width: 0%; background: var(--accent);"></div></div>
           </div>
-          <hr style="border: 0; border-top: 1px solid var(--border); margin: 12px 0;">
+          <hr style="border: 0; border-top: 1px solid var(--border); margin: 10px 0;">
           <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 6px;">Multidimensional Affect Vector (Control States):</div>
           <div id="affectTags" style="display: flex; flex-wrap: wrap; gap: 4px; font-size: 0.7rem;">
             <span style="background: #1e293b; padding: 2px 6px; border-radius: 3px;">Valence: <b id="affVal">0.0</b></span>
@@ -231,17 +274,18 @@
             <span style="background: #1e293b; padding: 2px 6px; border-radius: 3px;">Calmness: <b id="affCalm">0.8</b></span>
             <span style="background: #1e293b; padding: 2px 6px; border-radius: 3px;">Fear: <b id="affFear">0.0</b></span>
             <span style="background: #1e293b; padding: 2px 6px; border-radius: 3px;">Joy: <b id="affJoy">0.2</b></span>
+            <span style="background: #1e293b; padding: 2px 6px; border-radius: 3px;">Curiosity: <b id="affCur">0.5</b></span>
           </div>
         </div>
       </div>
 
-      <!-- Intervention Controls -->
+      <!-- Causal Intervention Controls -->
       <div class="panel" style="flex: 1;">
         <div class="panel-header">
           <span>D. Causal Intervention Console</span>
         </div>
         <div class="panel-body">
-          <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px;">Inject controlled perturbations to test causal counterfactuals:</p>
+          <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px;">Trigger live causal interventions $P(Y \mid do(X))$:</p>
           <div class="btn-group">
             <button class="action-btn" onclick="sendIntervention({'inflict_damage': 0.25})">⚡ Shock Integrity (-25%)</button>
             <button class="action-btn" onclick="sendIntervention({'replenish_energy': 0.3})">🔋 Replenish Energy</button>
@@ -260,6 +304,7 @@
     const ctx = canvas.getContext("2d");
     let nodes = [];
     let edges = [];
+    let rotAngle = 0;
 
     function resizeCanvas() {
       canvas.width = canvas.parentElement.clientWidth;
@@ -268,15 +313,14 @@
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
-    // Connect WebSocket
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const ws = new WebSocket(`${protocol}//${window.location.host}/ws/telemetry`);
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       document.getElementById("stepVal").innerText = data.step;
+      document.getElementById("timeVal").innerText = data.time.toFixed(2) + "s";
 
-      // Update Homeostasis
       document.getElementById("valEnergy").innerText = data.homeostasis.energy.toFixed(2);
       document.getElementById("barEnergy").style.width = `${Math.min(100, data.homeostasis.energy * 100)}%`;
       document.getElementById("valIntegrity").innerText = data.homeostasis.integrity.toFixed(2);
@@ -286,64 +330,87 @@
       document.getElementById("valPredErr").innerText = data.homeostasis.prediction_error.toFixed(2);
       document.getElementById("barPredErr").style.width = `${Math.min(100, data.homeostasis.prediction_error * 100)}%`;
 
-      // Update Affect
       document.getElementById("affVal").innerText = data.affect.valence.toFixed(2);
       document.getElementById("affAro").innerText = data.affect.arousal.toFixed(2);
       document.getElementById("affCalm").innerText = data.affect.calmness.toFixed(2);
       document.getElementById("affFear").innerText = data.affect.fear.toFixed(2);
       document.getElementById("affJoy").innerText = data.affect.joy.toFixed(2);
+      document.getElementById("affCur").innerText = (data.affect.curiosity || 0.5).toFixed(2);
 
-      // Initialize or update node positions
       if (nodes.length !== data.graph.num_nodes) {
         nodes = [];
-        const cx = canvas.width / 2;
-        const cy = canvas.height / 2;
-        const radius = Math.min(cx, cy) * 0.7;
+        const radius = Math.min(canvas.width, canvas.height) * 0.35;
         for (let i = 0; i < data.graph.num_nodes; i++) {
-          const angle = (i / data.graph.num_nodes) * 2 * Math.PI;
+          const theta = (i / data.graph.num_nodes) * 2 * Math.PI;
+          const phi = (i * 1.618) % Math.PI;
+          // 3D coordinates on ellipsoid
           nodes.push({
-            x: cx + radius * Math.cos(angle) + (Math.random() - 0.5) * 40,
-            y: cy + radius * Math.sin(angle) + (Math.random() - 0.5) * 40,
+            x3d: radius * Math.sin(phi) * Math.cos(theta),
+            y3d: (radius * 0.7) * Math.cos(phi),
+            z3d: radius * Math.sin(phi) * Math.sin(theta),
             type: data.node_types[i] || "node",
             activity: 0
           });
         }
       }
 
-      // Update activity levels
       data.nodes_activity.forEach((act, idx) => {
         if (nodes[idx]) nodes[idx].activity = act;
       });
       edges = data.graph.edges;
 
-      renderConnectome();
+      render3DConnectome();
     };
 
-    function renderConnectome() {
+    function render3DConnectome() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      rotAngle += 0.005; // Slow 3D rotation
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      const fov = 400;
+
+      // Project 3D nodes to 2D screen
+      const projected = nodes.map(n => {
+        // Rotate around Y axis
+        const cosR = Math.cos(rotAngle);
+        const sinR = Math.sin(rotAngle);
+        const rx = n.x3d * cosR - n.z3d * sinR;
+        const rz = n.x3d * sinR + n.z3d * cosR + 500;
+        const scale = fov / (rz > 10 ? rz : 10);
+        return {
+          sx: cx + rx * scale,
+          sy: cy + n.y3d * scale,
+          scale: scale,
+          z: rz,
+          type: n.type,
+          activity: n.activity
+        };
+      });
 
       // Render edges
       ctx.lineWidth = 1;
       edges.forEach(e => {
-        const src = nodes[e.source];
-        const dst = nodes[e.target];
-        if (src && dst) {
-          ctx.strokeStyle = Math.abs(e.weight) > 0.5 ? "rgba(56, 189, 248, 0.25)" : "rgba(30, 41, 59, 0.4)";
+        const p1 = projected[e.source];
+        const p2 = projected[e.target];
+        if (p1 && p2) {
+          const alpha = Math.min(0.6, Math.max(0.05, Math.abs(e.weight) * 0.4));
+          ctx.strokeStyle = Math.abs(e.weight) > 0.4 ? `rgba(56, 189, 248, ${alpha})` : `rgba(30, 41, 59, ${alpha * 0.5})`;
           ctx.beginPath();
-          ctx.moveTo(src.x, src.y);
-          ctx.lineTo(dst.x, dst.y);
+          ctx.moveTo(p1.sx, p1.sy);
+          ctx.lineTo(p2.sx, p2.sy);
           ctx.stroke();
         }
       });
 
-      // Render nodes
-      nodes.forEach((n, idx) => {
-        const glow = Math.min(20, n.activity * 15);
-        ctx.fillStyle = n.type.includes("rich") ? "#f43f5e" : (n.type.includes("hub") ? "#fbbf24" : "#38bdf8");
+      // Render nodes sorted by depth
+      projected.sort((a, b) => b.z - a.z);
+      projected.forEach(p => {
+        const size = Math.max(2, 6 * p.scale + p.activity * 12);
+        ctx.fillStyle = p.type.includes("rich") ? "#f43f5e" : (p.type.includes("hub") ? "#fbbf24" : "#38bdf8");
         ctx.shadowColor = ctx.fillStyle;
-        ctx.shadowBlur = glow;
+        ctx.shadowBlur = p.activity * 15;
         ctx.beginPath();
-        ctx.arc(n.x, n.y, 5 + glow * 0.3, 0, 2 * Math.PI);
+        ctx.arc(p.sx, p.sy, size, 0, 2 * Math.PI);
         ctx.fill();
         ctx.shadowBlur = 0;
       });
@@ -357,10 +424,29 @@
       });
     }
 
-    function switchView(view) {
-      // Toggle tabs
+    function switchTab(tab) {
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-      event.target.classList.add("active");
+      const canvasEl = document.getElementById("connectomeCanvas");
+      const theoriesEl = document.getElementById("theoriesContainer");
+      const expEl = document.getElementById("experimentsContainer");
+
+      canvasEl.style.display = "none";
+      theoriesEl.style.display = "none";
+      expEl.style.display = "none";
+
+      if (tab === "connectome") {
+        document.getElementById("tabConnectome").classList.add("active");
+        canvasEl.style.display = "block";
+        document.getElementById("visualizerTitle").innerText = "A. Living Connectome (Spiking Waves, Oscillations & Dynamic Synapses)";
+      } else if (tab === "theories") {
+        document.getElementById("tabTheories").classList.add("active");
+        theoriesEl.style.display = "block";
+        document.getElementById("visualizerTitle").innerText = "E. Consciousness Theory Laboratory (7 Competing Operational Paradigms)";
+      } else if (tab === "experiments") {
+        document.getElementById("tabExperiments").classList.add("active");
+        expEl.style.display = "block";
+        document.getElementById("visualizerTitle").innerText = "F. Experimental Discovery Ledger (Experiments A through P)";
+      }
     }
   </script>
 </body>
