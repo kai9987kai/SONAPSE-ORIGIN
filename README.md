@@ -1,3 +1,17 @@
+---
+license: apache-2.0
+tags:
+- computational-neuroscience
+- artificial-intelligence
+- complex-systems
+- consciousness-theories
+- dynamical-systems
+- scientific-research
+- python
+- map-elites
+- active-inference
+---
+
 # SONAPSE-ORIGIN
 
 **Autonomous Discovery of Neural Organisation, Homeostasis, Emergent Cognition and Consciousness-Relevant Dynamics**
@@ -5,7 +19,9 @@
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-Apache--2.0-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%2011%20%7C%20CPU--First-lightgrey.svg)]()
-[![Tests](https://img.shields.io/badge/tests-50%2F50%20passed-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/tests-57%2F57%20passed-brightgreen.svg)]()
+[![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Model%20Repo-yellow)](https://huggingface.co/Kai9987kai/SONAPSE-ORIGIN)
+[![GitHub](https://img.shields.io/badge/GitHub-SONAPSE--ORIGIN-black)](https://github.com/kai9987kai/SONAPSE-ORIGIN)
 
 ---
 
